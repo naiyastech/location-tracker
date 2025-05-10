@@ -11,6 +11,8 @@ import SwiftData
 @Model
 final class Item {
     var timestamp: Date
+    var latitude: Double?
+    var longitude: Double?
     
     init(timestamp: Date) {
         self.timestamp = timestamp
