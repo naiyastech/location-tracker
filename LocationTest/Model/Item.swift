@@ -11,10 +11,12 @@ import SwiftData
 @Model
 final class Item {
     var timestamp: Date
-    var latitude: Double?
-    var longitude: Double?
+    var latitude: Double
+    var longitude: Double
     
-    init(timestamp: Date) {
+    init(timestamp: Date, latitude: Double, longitude: Double) {
         self.timestamp = timestamp
+        self.latitude = latitude
+        self.longitude = longitude
     }
 }
