@@ -16,7 +16,7 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
     let manager: CLLocationManager = CLLocationManager()
     
     // Publish variables for user modification
-    @Published var distanceFilter: CLLocationDistance {
+/*    @Published var distanceFilter: CLLocationDistance {
         didSet {
             manager.distanceFilter = distanceFilter
         }
@@ -26,7 +26,7 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
             manager.desiredAccuracy = desiredAccuracy
         }
     }
-    
+*/
     override init() {
         self.manager.distanceFilter = 5
         self.manager.desiredAccuracy = kCLLocationAccuracyBest
