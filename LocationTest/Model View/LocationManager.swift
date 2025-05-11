@@ -23,6 +23,7 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
         self.manager.desiredAccuracy = kCLLocationAccuracyBest
         super.init()
         self.manager.delegate = self
+        
         manager.allowsBackgroundLocationUpdates = true
         manager.pausesLocationUpdatesAutomatically = false
     }
@@ -59,10 +60,15 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
     
     func logLocationToModel(location: CLLocation) {
         Task {
+            var placemark = "Unknown"
             do {
                 let (city, state, country) = try await LocationManager.shared.reverseGeocode(location: location)
-                let placemark = "City: \(city), State: \(state), Country: \(country)"
-                
+                placemark = "City: \(city), State: \(state), Country: \(country)"
+            } catch {
+                print("Failed to reverse geocode: \(error)")
+            }
+            
+            do {
                 let locationItem = Item(timestamp: Date(),
                                         latitude: location.coordinate.latitude,
                                         longitude: location.coordinate.longitude,
@@ -73,7 +79,7 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
                 context.insert(locationItem)
                 try context.save()
             } catch {
-                print("Failed to reverse geocode or save item: \(error)")
+                print("Failed to save item: \(error)")
             }
         }
     }
