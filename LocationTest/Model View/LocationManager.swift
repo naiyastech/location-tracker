@@ -15,30 +15,35 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
     static let shared = LocationManager()
     let manager: CLLocationManager = CLLocationManager()
     
+    // Publish variables for user modification
+    
+    
     override init() {
+        self.manager.distanceFilter = 5
+        self.manager.desiredAccuracy = kCLLocationAccuracyBest
         super.init()
         self.manager.delegate = self
-        manager.desiredAccuracy = kCLLocationAccuracyBest
-        manager.distanceFilter = 5
         manager.allowsBackgroundLocationUpdates = true
         manager.pausesLocationUpdatesAutomatically = false
-        
+    }
+    
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         switch manager.authorizationStatus {
         case .notDetermined:
-            self.manager.requestAlwaysAuthorization()
+            manager.requestAlwaysAuthorization()
         case .restricted:
-            print("Location access is restricted")
+            print("Location restricted")
         case .denied:
-            print("Location access is denied")
+            print("Location denied")
         case .authorizedWhenInUse:
-            print("Location access is only when in use")
+            print("Location when in use")
         case .authorizedAlways:
-            print("Location access is always")
-        default:
+            print("Location always")
+            manager.startUpdatingLocation()
+        @unknown default:
             print(manager.authorizationStatus.rawValue)
+            break
         }
-        
-        self.manager.startUpdatingLocation()
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {

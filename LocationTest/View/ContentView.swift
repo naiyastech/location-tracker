@@ -24,7 +24,7 @@ struct ContentView: View {
                             Text("Latitude: \(item.latitude)")
                             Text("Longitude: \(item.longitude)")
                             Text("Altitude: \(item.altitude)")
-                            Text("Placemark: \(item.placemark)")
+                            Text("Placemark: \(item.placemark)").font(.caption)
                         }
                     } label: {
                         Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
@@ -47,14 +47,6 @@ struct ContentView: View {
         }
     }
 
-/*    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date(),
-                               latitude: location.)
-            modelContext.insert(newItem)
-        }
-    }
-*/
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
