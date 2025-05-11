@@ -6,7 +6,7 @@
 //
 import Foundation
 import SwiftData
-import MapKit
+import CoreLocation
 import Observation
 
 @Observable
@@ -14,12 +14,12 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
     
     static let shared = LocationManager()
     let manager: CLLocationManager = CLLocationManager()
-    var region: MKCoordinateRegion = MKCoordinateRegion()
     
     override init() {
         super.init()
         self.manager.delegate = self
         manager.desiredAccuracy = kCLLocationAccuracyBest
+        manager.distanceFilter = 5
         manager.allowsBackgroundLocationUpdates = true
         manager.pausesLocationUpdatesAutomatically = false
         
@@ -43,8 +43,6 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         locations.last.map {
-            region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: $0.coordinate.latitude, longitude: $0.coordinate.longitude),
-                                        span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
             
             logLocationToModel(location: $0)
         }
@@ -55,16 +53,48 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
     }
     
     func logLocationToModel(location: CLLocation) {
-        let locationItem = Item(timestamp: Date(),
-                                latitude: location.coordinate.latitude,
-                                longitude: location.coordinate.longitude)
-        do {
-            let context = try ModelContext(ModelContainer(for: Item.self))
-            context.insert(locationItem)
-            try context.save()
-        } catch {
-            print("Failed to save item: \(error)")
+        Task {
+            do {
+                let (city, state, country) = try await LocationManager.shared.reverseGeocode(location: location)
+                let placemark = "City: \(city), State: \(state), Country: \(country)"
+                
+                let locationItem = Item(timestamp: Date(),
+                                        latitude: location.coordinate.latitude,
+                                        longitude: location.coordinate.longitude,
+                                        altitude: location.altitude,
+                                        placemark: placemark)
+                
+                let context = try ModelContext(ModelContainer(for: Item.self))
+                context.insert(locationItem)
+                try context.save()
+            } catch {
+                print("Failed to reverse geocode or save item: \(error)")
+            }
         }
     }
-    
+
+    func reverseGeocode(location: CLLocation) async throws -> (city: String, state: String, country: String) {
+        let geocoder = CLGeocoder()
+        return try await withCheckedThrowingContinuation { continuation in
+            geocoder.reverseGeocodeLocation(location) { placemarks, error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+                
+                guard let placemark = placemarks?.first else {
+                    continuation.resume(throwing: NSError(domain: "LocationManager", code: 0, userInfo: [NSLocalizedDescriptionKey: "No placemark found"]))
+                    return
+                }
+                
+                let city = placemark.locality ?? "Unknown City"
+                let state = placemark.administrativeArea ?? "Unknown State"
+                let country = placemark.country ?? "Unknown Country"
+                
+                continuation.resume(returning: (city, state, country))
+            }
+        }
+    }
+
+
 }

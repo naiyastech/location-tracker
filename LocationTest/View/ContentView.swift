@@ -19,10 +19,12 @@ struct ContentView: View {
             List {
                 ForEach(items) { item in
                     NavigationLink {
-                        VStack() {
+                        VStack(spacing: 5) {
                             Text("Location at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
                             Text("Latitude: \(item.latitude)")
                             Text("Longitude: \(item.longitude)")
+                            Text("Altitude: \(item.altitude)")
+                            Text("Placemark: \(item.placemark)")
                         }
                     } label: {
                         Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
