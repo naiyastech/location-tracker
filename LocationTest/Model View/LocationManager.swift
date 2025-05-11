@@ -16,7 +16,16 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
     let manager: CLLocationManager = CLLocationManager()
     
     // Publish variables for user modification
-    
+    @Published var distanceFilter: CLLocationDistance {
+        didSet {
+            manager.distanceFilter = distanceFilter
+        }
+    }
+    @Published var desiredAccuracy: CLLocationAccuracy {
+        didSet {
+            manager.desiredAccuracy = desiredAccuracy
+        }
+    }
     
     override init() {
         self.manager.distanceFilter = 5
@@ -24,8 +33,21 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
         super.init()
         self.manager.delegate = self
         
+        print("Accuracy: \(accuracyAuthorization())")
+        
         manager.allowsBackgroundLocationUpdates = true
         manager.pausesLocationUpdatesAutomatically = false
+    }
+    
+    func accuracyAuthorization() -> String {
+        switch manager.accuracyAuthorization {
+        case .fullAccuracy:
+            return "Full Accuracy"
+        case .reducedAccuracy:
+            return "Reduced Accuracy"
+        @unknown default:
+            return "Unknown Accuracy"
+        }
     }
     
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
