@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct SettingsView: View {
+    
+    @State private var location = LocationManager.shared
+    
     var body: some View {
         
         List {

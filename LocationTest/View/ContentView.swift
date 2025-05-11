@@ -9,11 +9,8 @@ import SwiftUI
 
 struct ContentView: View {
     
-    
-    @State private var location = LocationManager.shared
-    
     var body: some View {
-        NavigationSplitView {
+        NavigationStack {
             List {
                 NavigationLink(destination: LocationView()) {
                     Text("Location Data")
@@ -24,8 +21,6 @@ struct ContentView: View {
                 }
             }
             .navigationTitle("Data Options")
-        } detail: {
-            Text("Select an item")
         }
     }
 
