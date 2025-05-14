@@ -28,8 +28,8 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
     }
 */
     override init() {
-        self.manager.distanceFilter = 5
-        self.manager.desiredAccuracy = kCLLocationAccuracyBest
+        self.manager.distanceFilter = 100
+        self.manager.desiredAccuracy = kCLLocationAccuracyKilometer
         super.init()
         self.manager.delegate = self
         
