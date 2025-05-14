@@ -10,16 +10,35 @@ import SwiftUI
 struct SettingsView: View {
     
     @State private var location = LocationManager.shared
+    @State private var desiredAccuracy: LocationAccuracy = .kilometer
     
     var body: some View {
         
         List {
-            Text("Hello, World!")
+            settingAccuracy
+            
         }
         .navigationTitle("Settings")
+        .onAppear {
+            // Refresh preferences
+        }
         
     }
+    
+    var settingAccuracy: some View {
+        HStack {
+            Picker("Accuracy:", selection: $desiredAccuracy) {
+                ForEach(LocationAccuracy.allCases, id: \.self) { accuracy in
+                    Text(accuracy.rawValue).tag(accuracy)
+                }
+            }
+            .pickerStyle(.menu)
+        }
+    }
+    
+    
 }
+
 
 #Preview {
     SettingsView()
