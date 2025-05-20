@@ -37,7 +37,7 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
     
     func configureLocationManager() {
         manager.desiredAccuracy = kCLLocationAccuracyKilometer
-        manager.distanceFilter = 100
+        manager.distanceFilter = 500
         manager.allowsBackgroundLocationUpdates = true
         manager.pausesLocationUpdatesAutomatically = false
         manager.delegate = self
