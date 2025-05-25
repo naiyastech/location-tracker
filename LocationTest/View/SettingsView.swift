@@ -9,14 +9,16 @@ import SwiftUI
 
 struct SettingsView: View {
     
-    @State private var location = LocationManager.shared
-    @State private var desiredAccuracy: LocationAccuracy = .kilometer
+    @State private var userDefaults = UserDefaultsManager.shared
     
     var body: some View {
         
         List {
-            settingAccuracy
-            
+            Section("Location Settings") {
+                settingAccuracy
+                settingDistance
+                settingBackground
+            }
         }
         .navigationTitle("Settings")
         .onAppear {
@@ -27,15 +29,35 @@ struct SettingsView: View {
     
     var settingAccuracy: some View {
         HStack {
-            Picker("Accuracy:", selection: $desiredAccuracy) {
+            Picker("Accuracy", selection: $userDefaults.locationAccuracy) {
                 ForEach(LocationAccuracy.allCases, id: \.self) { accuracy in
-                    Text(accuracy.rawValue).tag(accuracy)
+                    Text(accuracy.description).tag(accuracy)
                 }
             }
             .pickerStyle(.menu)
         }
     }
     
+    var settingDistance: some View {
+        HStack {
+            Picker("Distance", selection: $userDefaults.locationDistance) {
+                ForEach(LocationDistance.allCases, id: \.self) { distance in
+                    Text(distance.description).tag(distance)
+                }
+            }
+            .pickerStyle(.menu)
+        }
+    }
+    
+    var settingBackground: some View {
+        VStack {
+            Toggle("Background Updates", isOn: $userDefaults.locationBackgroundEnabled)
+                .toggleStyle(SwitchToggleStyle(tint: .blue))
+            Text("Enable this to allow location tracking to continue when you have closed the app. This will increase battery usage but will provide you with a complete history of your location.")
+                .font(.caption)
+                .foregroundStyle(Color.gray)
+        }
+    }
     
 }
 
