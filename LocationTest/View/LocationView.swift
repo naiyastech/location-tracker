@@ -13,9 +13,14 @@ struct LocationView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [Item]
     
+    private var groupedItems: [Date: [Item]] {
+        Dictionary(grouping: items, by: { Calendar.current.startOfDay(for: $0.timestamp) })
+    }
+    
     @State private var exportedFileURL: URL?
     @State private var isExported: Bool = true
     @State private var isSheetPresented: Bool = false
+    @State private var disclosureStates: [Date: Bool] = [:]
     
     var body: some View {
         
@@ -29,14 +34,29 @@ struct LocationView: View {
         } else {
             
             List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        LocationDetailsView(item: item)
+                ForEach(groupedItems.keys.sorted(), id: \.self) { date in
+                    DisclosureGroup(
+                        isExpanded: Binding(
+                            get: { disclosureStates[date] ?? false },
+                            set: { disclosureStates[date] = $0 }
+                        )
+                    ) {
+                        ForEach(groupedItems[date] ?? [], id: \.self) { item in
+                            NavigationLink {
+                                LocationDetailsView(item: item)
+                            } label: {
+                                Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+                            }
+                        }
+                        .onDelete(perform: deleteItems)
                     } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+                        let itemCount = groupedItems[date]?.count ?? 0
+                        Text("\(date, format: Date.FormatStyle(date: .numeric, time: .omitted)) (\(itemCount))")
+                            .bold()
+                            .foregroundColor(.primary)
                     }
+                    
                 }
-                .onDelete(perform: deleteItems)
             }
             .sheet(isPresented: $isSheetPresented, content: {
                 if let fileURL = exportedFileURL {
