@@ -14,20 +14,7 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
     
     static let shared = LocationManager()
     let manager: CLLocationManager = CLLocationManager()
-    //private var settings: LocationSettings
     
-    /*/ Publish variables for user modification
-    @Published var distanceFilter: CLLocationDistance {
-        didSet {
-            manager.distanceFilter = distanceFilter
-        }
-    }
-    @Published var desiredAccuracy: CLLocationAccuracy {
-        didSet {
-            manager.desiredAccuracy = desiredAccuracy
-        }
-    }
-    */
     override init() {
         super.init()
         self.manager.delegate = self
@@ -44,10 +31,17 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
         manager.delegate = self
     }
     
-    /*func updateSettings(_ newSettings: LocationSettings) {
-        self.settings = newSettings
+    func updateSettings(_ newSettings: LocationSettings) {
+        let userDefaults = UserDefaultsManager.shared
+        
+        // Update UserDefaults with the new settings
+        userDefaults.locationAccuracy = newSettings.locationAccuracy
+        userDefaults.locationDistance = newSettings.locationDistance
+        userDefaults.locationBackgroundEnabled = newSettings.locationBackgroundEnabled
+        
+        // Reconfigure the CLLocationManager with the updated settings
         configureLocationManager()
-    }*/
+    }
     
     func accuracyAuthorization() -> String {
         switch manager.accuracyAuthorization {

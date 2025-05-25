@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SettingsView: View {
     
+    @State private var locationManager = LocationManager.shared
     @State private var userDefaults = UserDefaultsManager.shared
     
     var body: some View {
@@ -35,6 +36,9 @@ struct SettingsView: View {
                 }
             }
             .pickerStyle(.menu)
+            .onChange(of: userDefaults.locationAccuracy) { oldValue, newValue in
+                updateLocationManagerSettings()
+            }
         }
     }
     
@@ -46,6 +50,9 @@ struct SettingsView: View {
                 }
             }
             .pickerStyle(.menu)
+            .onChange(of: userDefaults.locationDistance) { oldValue, newValue in
+                updateLocationManagerSettings()
+            }
         }
     }
     
@@ -53,14 +60,23 @@ struct SettingsView: View {
         VStack {
             Toggle("Background Updates", isOn: $userDefaults.locationBackgroundEnabled)
                 .toggleStyle(SwitchToggleStyle(tint: .blue))
+                .onChange(of: userDefaults.locationBackgroundEnabled) { oldValue, newValue in
+                    updateLocationManagerSettings()
+                }
             Text("Enable this to allow location tracking to continue when you have closed the app. This will increase battery usage but will provide you with a complete history of your location.")
                 .font(.caption)
                 .foregroundStyle(Color.gray)
         }
     }
     
+    func updateLocationManagerSettings() {
+        let newSettings = LocationSettings(locationAccuracy: userDefaults.locationAccuracy,
+                                           locationDistance: userDefaults.locationDistance,
+                                           locationBackgroundEnabled: userDefaults.locationBackgroundEnabled)
+        locationManager.updateSettings(newSettings)
+    }
+    
 }
-
 
 #Preview {
     SettingsView()

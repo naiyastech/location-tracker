@@ -10,6 +10,9 @@ import SwiftUI
 struct ContentView: View {
     
     var body: some View {
+        
+        Spacer()
+        
         NavigationStack {
             List {
                 NavigationLink(destination: LocationView()) {

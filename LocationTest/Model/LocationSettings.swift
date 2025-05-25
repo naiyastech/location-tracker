@@ -1,10 +1,11 @@
 import CoreLocation
 
-struct LocationSettings {
-    var desiredAccuracy: LocationAccuracy
-    var distanceFilter: LocationDistance
-    var allowsBackgroundLocationUpdates: Bool
+struct LocationSettings: Codable {
+    var locationAccuracy: LocationAccuracy
+    var locationDistance: LocationDistance
+    var locationBackgroundEnabled: Bool
 }
+
 
 enum LocationAccuracy: String, CaseIterable, Codable {
     case best = "Best"
