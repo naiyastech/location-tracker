@@ -15,7 +15,7 @@ struct ContentView: View {
         
         NavigationStack {
             List {
-                NavigationLink(destination: LocationView()) {
+                NavigationLink(destination: LocationDataView()) {
                     Text("Location Data")
                 }
                 

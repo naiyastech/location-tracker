@@ -19,6 +19,10 @@ final class Item {
     var state: String?
     var city: String?
     
+    var day: Date {
+        Calendar.current.startOfDay(for: timestamp)
+    }
+    
     init(timestamp: Date,
          latitude: Double,
          longitude: Double,

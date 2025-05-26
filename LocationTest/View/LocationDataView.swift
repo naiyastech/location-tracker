@@ -8,13 +8,13 @@
 import SwiftUI
 import SwiftData
 
-struct LocationView: View {
+struct LocationDataView: View {
     
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [Item]
     
     private var groupedItems: [Date: [Item]] {
-        Dictionary(grouping: items, by: { Calendar.current.startOfDay(for: $0.timestamp) })
+        Dictionary(grouping: items, by: { $0.day })
     }
     
     @State private var exportedFileURL: URL?
@@ -35,27 +35,12 @@ struct LocationView: View {
             
             List {
                 ForEach(groupedItems.keys.sorted(), id: \.self) { date in
-                    DisclosureGroup(
-                        isExpanded: Binding(
-                            get: { disclosureStates[date] ?? false },
-                            set: { disclosureStates[date] = $0 }
-                        )
-                    ) {
-                        ForEach(groupedItems[date] ?? [], id: \.self) { item in
-                            NavigationLink {
-                                LocationDetailsView(item: item)
-                            } label: {
-                                Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                            }
-                        }
-                        .onDelete(perform: deleteItems)
+                    NavigationLink {
+                        LocationDateView(date: date, items: groupedItems[date] ?? [])
                     } label: {
                         let itemCount = groupedItems[date]?.count ?? 0
                         Text("\(date, format: Date.FormatStyle(date: .numeric, time: .omitted)) (\(itemCount))")
-                            .bold()
-                            .foregroundColor(.primary)
                     }
-                    
                 }
             }
             .sheet(isPresented: $isSheetPresented, content: {
@@ -92,14 +77,7 @@ struct LocationView: View {
                     }
                 }
             }
-        }
-    }
-    
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
-            }
+            .navigationTitle("Location Data")
         }
     }
     
@@ -127,11 +105,11 @@ struct LocationView: View {
     
     private func generateCSV(from items: [Item]) async -> Data {
         await Task.detached {
-            var csvString = "Timestamp,Latitude,Longitude,Altitude,Placemark\n" // CSV Header
-            for item in items {
-                csvString += "\(item.timestamp),\(item.latitude),\(item.longitude),\(item.altitude),\(item.placemark)\n" // Append item data
+            let csvHeader = "Timestamp,Latitude,Longitude,Altitude,Country,State,City,Placemark\n" // CSV Header
+            let csvRows = items.map { item in
+                "\(item.timestamp),\(item.latitude),\(item.longitude),\(item.altitude),\(item.isoCountry ?? "XX"),\(item.state ?? ""),\(item.city ?? ""),\(item.placemark)\n"
             }
-            return Data(csvString.utf8)
+            return Data((csvHeader + csvRows.joined()).utf8)
         }.value
     }
     
@@ -142,6 +120,6 @@ struct LocationView: View {
 }
 
 #Preview {
-    LocationView()
+    LocationDataView()
         .modelContainer(for: Item.self, inMemory: true)
 }

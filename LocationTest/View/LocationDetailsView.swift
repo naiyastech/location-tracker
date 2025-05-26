@@ -59,7 +59,7 @@ struct LocationDetailsView: View {
             }
             
         }
-        .navigationTitle("Location Details")
+        .navigationTitle("Details")
     }
     
 }

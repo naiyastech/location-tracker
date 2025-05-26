@@ -98,7 +98,7 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
             var locationCity = "Unknown"
             do {
                 let (city, state, country) = try await LocationManager.shared.reverseGeocode(location: location)
-                placemark = "City: \(city), State: \(state), Country: \(country)"
+                placemark = "City: \(city); State: \(state); Country: \(country)"
                 locationCountry = country
                 locationState = state
                 locationCity = city
@@ -142,7 +142,7 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
                 let city = placemark.locality ?? "Unknown City"
                 let state = placemark.administrativeArea ?? "Unknown State"
                 let country = placemark.isoCountryCode ?? "XX"
-                let timezone = placemark.timeZone ?? .none
+                //let timezone = placemark.timeZone ?? .none
                 
                 continuation.resume(returning: (city, state, country))
             }
