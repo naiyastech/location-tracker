@@ -35,7 +35,7 @@ class UserDefaultsManager {
     }
     
     private init() {
-        let accuracyRawValue = UserDefaults.standard.string(forKey: locationAccuracyKey) ?? LocationAccuracy.best.rawValue
+        let accuracyRawValue = UserDefaults.standard.string(forKey: locationAccuracyKey) ?? LocationAccuracy.kilometer.rawValue
         self.locationAccuracy = LocationAccuracy(rawValue: accuracyRawValue) ?? .kilometer
         
         let distanceRawValue = UserDefaults.standard.double(forKey: locationDistanceKey)

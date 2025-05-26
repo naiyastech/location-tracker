@@ -15,12 +15,25 @@ final class Item {
     var longitude: Double
     var altitude: Double
     var placemark: String
+    var isoCountry: String?
+    var state: String?
+    var city: String?
     
-    init(timestamp: Date, latitude: Double, longitude: Double, altitude: Double, placemark: String) {
+    init(timestamp: Date,
+         latitude: Double,
+         longitude: Double,
+         altitude: Double,
+         placemark: String,
+         isoCountry: String? = nil,
+         state: String? = nil,
+         city: String? = nil) {
         self.timestamp = timestamp
         self.latitude = latitude
         self.longitude = longitude
         self.altitude = altitude
         self.placemark = placemark
+        self.isoCountry = isoCountry
+        self.state = state
+        self.city = city
     }
 }

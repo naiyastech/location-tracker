@@ -25,8 +25,11 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
     func configureLocationManager() {
         let userDefaults = UserDefaultsManager.shared
         manager.desiredAccuracy = userDefaults.locationAccuracy.clAccuracy
+        print("Configure manager: \(userDefaults.locationAccuracy.description)")
         manager.distanceFilter = userDefaults.locationDistance.clDistance
+        print("Configure manager: \(userDefaults.locationDistance.description)")
         manager.allowsBackgroundLocationUpdates = userDefaults.locationBackgroundEnabled
+        print("Configure manager: \(userDefaults.locationBackgroundEnabled.description)")
         manager.pausesLocationUpdatesAutomatically = false
         manager.delegate = self
     }
@@ -36,8 +39,11 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
         
         // Update UserDefaults with the new settings
         userDefaults.locationAccuracy = newSettings.locationAccuracy
+        print("Update default: \(userDefaults.locationAccuracy.description)")
         userDefaults.locationDistance = newSettings.locationDistance
+        print("Update default: \(userDefaults.locationDistance.description)")
         userDefaults.locationBackgroundEnabled = newSettings.locationBackgroundEnabled
+        print("Update default: \(userDefaults.locationBackgroundEnabled.description)")
         
         // Reconfigure the CLLocationManager with the updated settings
         configureLocationManager()
@@ -87,9 +93,15 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
     func logLocationToModel(location: CLLocation) {
         Task {
             var placemark = "Unknown"
+            var locationCountry = "XX"
+            var locationState = "Unknown"
+            var locationCity = "Unknown"
             do {
                 let (city, state, country) = try await LocationManager.shared.reverseGeocode(location: location)
                 placemark = "City: \(city), State: \(state), Country: \(country)"
+                locationCountry = country
+                locationState = state
+                locationCity = city
             } catch {
                 print("Failed to reverse geocode: \(error)")
             }
@@ -99,7 +111,10 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
                                         latitude: location.coordinate.latitude,
                                         longitude: location.coordinate.longitude,
                                         altitude: location.altitude,
-                                        placemark: placemark)
+                                        placemark: placemark,
+                                        isoCountry: locationCountry,
+                                        state: locationState,
+                                        city: locationCity)
                 
                 let context = try ModelContext(ModelContainer(for: Item.self))
                 context.insert(locationItem)
@@ -126,7 +141,8 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
                 
                 let city = placemark.locality ?? "Unknown City"
                 let state = placemark.administrativeArea ?? "Unknown State"
-                let country = placemark.country ?? "Unknown Country"
+                let country = placemark.isoCountryCode ?? "XX"
+                let timezone = placemark.timeZone ?? .none
                 
                 continuation.resume(returning: (city, state, country))
             }

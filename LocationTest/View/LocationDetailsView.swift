@@ -14,32 +14,50 @@ struct LocationDetailsView: View {
     var body: some View {
         
         List {
-            
-            HStack() {
-                Text("Date and time:")
+            HStack {
+                Text("Timestamp:")
                 Spacer()
-                Text("\(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
+                Text("\(item.timestamp.ISO8601Format())")
+            }
+            Section("Coordinates") {
+                HStack {
+                    Text("Latitude:")
+                    Spacer()
+                    Text("\(item.latitude)")
+                }
+                HStack {
+                    Text("Longitude:")
+                    Spacer()
+                    Text("\(item.longitude)")
+                }
+                HStack {
+                    Text("Altitude:")
+                    Spacer()
+                    Text("\(item.altitude)")
+                }
+            }
+            Section("Location Info") {
+                HStack {
+                    Text("Country:")
+                    Spacer()
+                    Text("\(item.isoCountry ?? "N/A")")
+                }
+                HStack {
+                    Text("State:")
+                    Spacer()
+                    Text("\(item.state ?? "N/A")")
+                }
+                HStack {
+                    Text("City:")
+                    Spacer()
+                    Text("\(item.city ?? "N/A")")
+                }
+                
+                Text("\(item.placemark)")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
             }
             
-            HStack() {
-                Text("Latitude:")
-                Spacer()
-                Text("\(item.latitude)")
-            }
-            
-            HStack() {
-                Text("Longitude:")
-                Spacer()
-                Text("\(item.longitude)")
-            }
-            
-            HStack() {
-                Text("Altitude (m):")
-                Spacer()
-                Text("\(item.altitude)")
-            }
-            
-            Text("\(item.placemark)").font(.caption)
         }
         .navigationTitle("Location Details")
     }
